@@ -7,7 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.dsy1105_005d_2026.ui.Home.MuestraDatosScreen
-import com.example.dsy1105_005d_2026.ui.qr.QrLecturaScreen
+import com.example.dsy1105_005d_2026.ui.qr.LectorQrScreen
 import com.example.dsy1105_005d_2026.ui.solicitud.DetalleSolicitudScreen
 import com.example.dsy1105_005d_2026.ui.solicitud.ListaSolicitudesScreen
 import com.example.dsy1105_005d_2026.ui.solicitud.QrScannerScreen
@@ -60,8 +60,8 @@ fun AppNavigation() {
             )
         }
 
-        composable("qrLectura") {
-            QrLecturaScreen()
+        composable("lector_qr") {
+            LectorQrScreen()
         }
 
         composable(

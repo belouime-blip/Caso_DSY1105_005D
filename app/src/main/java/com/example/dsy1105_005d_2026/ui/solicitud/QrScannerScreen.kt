@@ -1,14 +1,8 @@
 package com.example.dsy1105_005d_2026.ui.solicitud
 
 import android.Manifest
-import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.Preview
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,16 +21,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.mlkit.vision.barcode.BarcodeScannerOptions
-import com.google.mlkit.vision.barcode.BarcodeScanning
-import com.google.mlkit.vision.barcode.common.Barcode
-import com.google.mlkit.vision.common.InputImage
-import java.util.concurrent.Executors
+import com.example.dsy1105_005d_2026.ui.components.QrScanner
+import com.example.dsy1105_005d_2026.util.CameraPermissionHelper
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,16 +33,8 @@ fun QrScannerScreen(
     vm: SolicitudViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
-    var permiso by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
-                PackageManager.PERMISSION_GRANTED
-        )
-    }
-    var mensaje by remember { mutableStateOf("Apunta la cámara al QR de una solicitud") }
-    val ocupado = remember { booleanArrayOf(false) }
-    val ejecutor = remember { Executors.newSingleThreadExecutor() }
+    var permiso by remember { mutableStateOf(CameraPermissionHelper.hasCameraPermission(context)) }
+    var codigoNoRegistrado by remember { mutableStateOf<String?>(null) }
 
     val pedirPermiso = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
         permiso = it
@@ -73,67 +53,51 @@ fun QrScannerScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            Text(mensaje, modifier = Modifier.padding(bottom = 12.dp))
+            val noRegistrado = codigoNoRegistrado
 
-            if (permiso) {
-                AndroidView(
-                    factory = { ctx ->
-                        val vista = PreviewView(ctx)
-                        val futuro = ProcessCameraProvider.getInstance(ctx)
-                        futuro.addListener({
-                            val proveedor = futuro.get()
-                            val preview = Preview.Builder().build().also {
-                                it.setSurfaceProvider(vista.surfaceProvider)
-                            }
-                            val scanner = BarcodeScanning.getClient(
-                                BarcodeScannerOptions.Builder()
-                                    .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
-                                    .build()
-                            )
-                            val analisis = ImageAnalysis.Builder()
-                                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                                .build()
-                            analisis.setAnalyzer(ejecutor) { proxy ->
-                                if (ocupado[0]) {
-                                    proxy.close()
-                                    return@setAnalyzer
+            when {
+                !permiso -> {
+                    Text(
+                        "Se necesita permiso de cámara para leer el QR",
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+                    Button(onClick = { pedirPermiso.launch(Manifest.permission.CAMERA) }) {
+                        Text("Permitir cámara")
+                    }
+                }
+
+                noRegistrado != null -> {
+                    Text(
+                        "Código no registrado: $noRegistrado",
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+                    Button(
+                        onClick = { codigoNoRegistrado = null },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Escanear de nuevo")
+                    }
+                }
+
+                else -> {
+                    Text(
+                        "Apunta la cámara al QR de una solicitud",
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+                    QrScanner(
+                        onQrCodeScanned = { valor ->
+                            vm.buscarPorCodigo(valor) { id ->
+                                if (id != null) {
+                                    onEncontrado(id)
+                                } else {
+                                    codigoNoRegistrado = valor
                                 }
-                                val imagen = InputImage.fromBitmap(
-                                    proxy.toBitmap(),
-                                    proxy.imageInfo.rotationDegrees
-                                )
-                                scanner.process(imagen)
-                                    .addOnSuccessListener { codigos ->
-                                        val valor = codigos.firstOrNull()?.rawValue
-                                        if (valor != null && !ocupado[0]) {
-                                            ocupado[0] = true
-                                            vm.buscarPorCodigo(valor) { id ->
-                                                if (id != null) {
-                                                    onEncontrado(id)
-                                                } else {
-                                                    mensaje = "Código no registrado: $valor"
-                                                    ocupado[0] = false
-                                                }
-                                            }
-                                        }
-                                    }
-                                    .addOnCompleteListener { proxy.close() }
                             }
-                            proveedor.unbindAll()
-                            proveedor.bindToLifecycle(
-                                lifecycleOwner,
-                                CameraSelector.DEFAULT_BACK_CAMERA,
-                                preview,
-                                analisis
-                            )
-                        }, ContextCompat.getMainExecutor(ctx))
-                        vista
-                    },
-                    modifier = Modifier.fillMaxWidth().height(360.dp)
-                )
-            } else {
-                Button(onClick = { pedirPermiso.launch(Manifest.permission.CAMERA) }) {
-                    Text("Permitir cámara")
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(360.dp)
+                    )
                 }
             }
         }

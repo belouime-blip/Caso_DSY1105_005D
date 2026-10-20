@@ -7,8 +7,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class QrViewModel : ViewModel() {
-    private val repository = QrRepository()
+class QrViewModel(
+    private val repository: QrRepository = QrRepository()
+) : ViewModel() {
 
     private val _qrResult = MutableStateFlow<QrResult?>(null)
     val qrResult: StateFlow<QrResult?> = _qrResult.asStateFlow()

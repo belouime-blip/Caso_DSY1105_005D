@@ -1,7 +1,6 @@
 package com.example.dsy1105_005d_2026.ui.theme
 
 
-import android.R.attr.enabled
 import com.example.dsy1105_005d_2026.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -58,7 +57,7 @@ fun HomeScreen(
     val ColorScheme = darkColorScheme(
         primary= Color(0xFF8D1421),
         onPrimary =Color.White,
-        onSurface =Color(0xFF3333333)
+        onSurface =Color(0xFF333333)
     ) // fin dark
     
     MaterialTheme(

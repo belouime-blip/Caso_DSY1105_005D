@@ -1,4 +1,4 @@
-package com.example.dsy1105_005d_2026.utils
+package com.example.dsy1105_005d_2026.util
 
 import android.Manifest
 import android.content.Context

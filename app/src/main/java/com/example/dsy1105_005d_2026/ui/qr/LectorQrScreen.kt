@@ -24,6 +24,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,43 +34,67 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.dsy1105_005d_2026.utils.CameraPermissionHelper
+import com.example.dsy1105_005d_2026.ui.components.QrScanner
+import com.example.dsy1105_005d_2026.util.CameraPermissionHelper
 
+/**
+ * Lector de QR genérico: muestra el contenido leído.
+ * (El lector que busca una solicitud por su código está en ui.solicitud.QrScannerScreen).
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QrLecturaScreen(
-    vm: QrViewModel = viewModel()
+fun LectorQrScreen(
+    viewModel: QrViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    val qrResult by vm.qrResult.collectAsState()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val qrResult by viewModel.qrResult.collectAsState()
+
     var hasCameraPermission by remember {
         mutableStateOf(CameraPermissionHelper.hasCameraPermission(context))
     }
-    var isScanning by remember { mutableStateOf(true) }
 
-    val pedirPermiso = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { ok ->
-        hasCameraPermission = ok
-        if (ok) {
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        hasCameraPermission = isGranted
+        if (isGranted) {
             Toast.makeText(context, "Permiso de cámara concedido", Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(context, "Se necesita permiso de cámara para escanear QR", Toast.LENGTH_LONG).show()
         }
     }
 
+    // Al volver a la app (por ejemplo desde Ajustes) se vuelve a revisar el permiso
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                hasCameraPermission = CameraPermissionHelper.hasCameraPermission(context)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Lectura de QR") }) }
-    ) { padding ->
+        topBar = { TopAppBar(title = { Text("Lector QR") }) }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
-                .padding(padding)
+                .padding(innerPadding)
                 .fillMaxSize()
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+            val resultado = qrResult
+
             if (!hasCameraPermission) {
                 Text(
                     "Permiso de cámara requerido",
@@ -83,10 +108,10 @@ fun QrLecturaScreen(
                     textAlign = TextAlign.Center
                 )
                 Spacer(Modifier.height(24.dp))
-                Button(onClick = { pedirPermiso.launch(Manifest.permission.CAMERA) }) {
+                Button(onClick = { requestPermissionLauncher.launch(Manifest.permission.CAMERA) }) {
                     Text("Conceder permiso de cámara")
                 }
-            } else if (qrResult == null && isScanning) {
+            } else if (resultado == null) {
                 Text(
                     "Escanea un código QR",
                     style = MaterialTheme.typography.titleLarge,
@@ -100,8 +125,7 @@ fun QrLecturaScreen(
                 ) {
                     QrScanner(
                         onQrCodeScanned = { contenido ->
-                            vm.onQrDetected(contenido)
-                            isScanning = false
+                            viewModel.onQrDetected(contenido)
                             Toast.makeText(context, "QR detectado!", Toast.LENGTH_SHORT).show()
                         },
                         modifier = Modifier.fillMaxSize()
@@ -126,44 +150,36 @@ fun QrLecturaScreen(
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "La cámara debería activarse automáticamente",
+                    "La cámara se activa automáticamente",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-            } else if (qrResult != null) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(16.dp)
+            } else {
+                Text(
+                    "QR detectado:",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
                 ) {
                     Text(
-                        "QR Detectado:",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        resultado.content,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(16.dp)
                     )
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant
-                        )
-                    ) {
-                        Text(
-                            qrResult?.content.orEmpty(),
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
-                    Spacer(Modifier.height(16.dp))
-                    Button(
-                        onClick = {
-                            vm.clearResult()
-                            isScanning = true
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Escanear otro código QR")
-                    }
+                }
+                Spacer(Modifier.height(16.dp))
+                Button(
+                    onClick = { viewModel.clearResult() },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Escanear otro código QR")
                 }
             }
         }

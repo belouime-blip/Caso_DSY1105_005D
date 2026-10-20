@@ -41,8 +41,8 @@ fun MuestraDatosScreen(
                 Text("Solicitudes")
             }
 
-            Button(onClick = { navController.navigate("qrLectura") }) {
-                Text("Leer código QR")
+            Button(onClick = { navController.navigate("lector_qr") }) {
+                Text("Lector QR")
             }
 
             OutlinedButton(
