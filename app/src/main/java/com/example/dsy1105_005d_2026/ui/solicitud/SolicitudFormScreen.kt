@@ -38,6 +38,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.example.dsy1105_005d_2026.viewmodel.SolicitudViewModel
 import java.io.File
 
 val categorias = listOf("Reclamo", "Consulta", "Sugerencia", "Soporte")

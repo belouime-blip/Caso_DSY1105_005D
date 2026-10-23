@@ -42,6 +42,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.dsy1105_005d_2026.ui.components.QrScanner
 import com.example.dsy1105_005d_2026.util.CameraPermissionHelper
+import com.example.dsy1105_005d_2026.viewmodel.QrViewModel
 
 /**
  * Lector de QR genérico: muestra el contenido leído.

@@ -1,4 +1,4 @@
-package com.example.dsy1105_005d_2026.ui.solicitud
+package com.example.dsy1105_005d_2026.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.dsy1105_005d_2026.data.local.AppDatabase
 import com.example.dsy1105_005d_2026.data.local.SolicitudEntity
 import com.example.dsy1105_005d_2026.data.repository.SolicitudRepository
+import com.example.dsy1105_005d_2026.ui.solicitud.SolicitudUiState
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

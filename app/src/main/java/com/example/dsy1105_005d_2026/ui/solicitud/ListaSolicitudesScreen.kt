@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.dsy1105_005d_2026.ui.theme.ColoresApp
+import com.example.dsy1105_005d_2026.viewmodel.SolicitudViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -1,10 +1,11 @@
-package com.example.dsy1105_005d_2026.ui.login
+package com.example.dsy1105_005d_2026.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.dsy1105_005d_2026.data.repository.AuthRepository
+import com.example.dsy1105_005d_2026.ui.login.LoginUiState
 
 class LoginViewModel (
     private val repo: AuthRepository= AuthRepository()

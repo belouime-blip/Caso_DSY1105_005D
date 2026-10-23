@@ -1,4 +1,4 @@
-package com.example.dsy1105_005d_2026.ui.qr
+package com.example.dsy1105_005d_2026.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.example.dsy1105_005d_2026.data.model.QrResult
