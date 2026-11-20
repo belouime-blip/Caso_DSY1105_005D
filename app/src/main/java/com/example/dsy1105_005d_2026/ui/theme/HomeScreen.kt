@@ -22,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,22 +32,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.dsy1105_005d_2026.R
+import com.example.dsy1105_005d_2026.viewmodel.AppViewModelFactory
 import com.example.dsy1105_005d_2026.viewmodel.LoginViewModel
 
+/**
+ * Pantalla de login. Valida correo y contraseña contra Room y, según el rol del usuario,
+ * navega a la página de su perfil: cliente_home, admin_home o tecnico_home.
+ */
 @Composable
 fun HomeScreen(
     navController: NavController,
-    vm: LoginViewModel = viewModel()
+    vm: LoginViewModel = viewModel(factory = AppViewModelFactory(LocalContext.current))
 ) {
     val state = vm.uiState
     var showPass by remember { mutableStateOf(false) }
@@ -95,9 +100,9 @@ fun HomeScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     OutlinedTextField(
-                        value = state.username,
-                        onValueChange = vm::onUsernameChange,
-                        label = { Text("Usuario") },
+                        value = state.correo,
+                        onValueChange = vm::onCorreoChange,
+                        label = { Text("Correo") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -131,8 +136,9 @@ fun HomeScreen(
 
                     Button(
                         onClick = {
-                            vm.submit { user ->
-                                navController.navigate("muestraDatos/$user") {
+                            vm.submit { rol ->
+                                // Cada perfil tiene su propia página de inicio
+                                navController.navigate(rol.rutaInicio) {
                                     popUpTo("login") { inclusive = true }
                                     launchSingleTop = true
                                 }
@@ -145,15 +151,23 @@ fun HomeScreen(
                     ) {
                         Text(if (state.isLoading) "Validando..." else "Iniciar sesión")
                     }
+
+                    TextButton(
+                        onClick = { navController.navigate("registro") },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("¿No tienes cuenta? Regístrate")
+                    }
                 }
             }
+
+            Spacer(Modifier.height(16.dp))
+
+            Text(
+                text = "Cuentas de prueba (clave 123456):\n" +
+                    "cliente@duoc.cl · admin@duoc.cl · tecnico@duoc.cl",
+                style = MaterialTheme.typography.bodySmall
+            )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    val navController = rememberNavController()
-    HomeScreen(navController = navController, vm = LoginViewModel())
 }

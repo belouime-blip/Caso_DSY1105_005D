@@ -39,6 +39,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.example.dsy1105_005d_2026.data.model.Rol
+import com.example.dsy1105_005d_2026.data.session.SesionManager
 import com.example.dsy1105_005d_2026.ui.theme.ColoresApp
 import com.example.dsy1105_005d_2026.viewmodel.SolicitudViewModel
 
@@ -101,6 +103,8 @@ fun DetalleSolicitudScreen(
                         }
                     }
 
+                    PanelGestionSolicitud(s = s, vm = vm)
+
                     s.evidenciaUri?.let {
                         Card(
                             modifier = Modifier.fillMaxWidth(),
@@ -156,7 +160,7 @@ fun DetalleSolicitudScreen(
                         }
                     }
 
-                    Button(
+                    if (SesionManager.rol == Rol.CLIENTE || SesionManager.rol == Rol.ADMINISTRADOR) Button(
                         onClick = { onEditar(s.id) },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -164,7 +168,7 @@ fun DetalleSolicitudScreen(
                     ) {
                         Text("Editar")
                     }
-                    OutlinedButton(
+                    if (SesionManager.rol == Rol.ADMINISTRADOR) OutlinedButton(
                         onClick = { confirmar = true },
                         modifier = Modifier
                             .fillMaxWidth()

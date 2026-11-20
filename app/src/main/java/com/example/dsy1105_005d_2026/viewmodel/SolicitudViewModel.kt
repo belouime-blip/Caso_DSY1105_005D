@@ -5,8 +5,12 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dsy1105_005d_2026.data.local.AppDatabase
 import com.example.dsy1105_005d_2026.data.local.SolicitudEntity
+import com.example.dsy1105_005d_2026.data.local.UsuarioEntity
+import com.example.dsy1105_005d_2026.data.model.Rol
 import com.example.dsy1105_005d_2026.data.repository.SolicitudRepository
+import com.example.dsy1105_005d_2026.data.session.SesionManager
 import com.example.dsy1105_005d_2026.ui.solicitud.SolicitudUiState
+import com.example.dsy1105_005d_2026.util.SolicitudFlujo
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +22,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class SolicitudViewModel(app: Application) : AndroidViewModel(app) {
-    private val repo = SolicitudRepository(AppDatabase.obtener(app).solicitudDao())
+    private val db = AppDatabase.obtener(app)
+    private val repo = SolicitudRepository(db.solicitudDao())
 
     private val _busqueda = MutableStateFlow("")
     val busqueda: StateFlow<String> = _busqueda.asStateFlow()
@@ -26,15 +31,26 @@ class SolicitudViewModel(app: Application) : AndroidViewModel(app) {
     private val _categoriaFiltro = MutableStateFlow("")
     val categoriaFiltro: StateFlow<String> = _categoriaFiltro.asStateFlow()
 
+    // Lista según el perfil: cliente ve las suyas, técnico las asignadas, administrador todas
     val solicitudes: StateFlow<List<SolicitudEntity>> =
-        combine(repo.solicitudes, _busqueda, _categoriaFiltro) { lista, texto, categoria ->
-            lista.filter { s ->
+        combine(
+            repo.solicitudes,
+            _busqueda,
+            _categoriaFiltro,
+            SesionManager.usuario
+        ) { lista, texto, categoria, usuario ->
+            SolicitudFlujo.visiblesPara(lista, usuario).filter { s ->
                 (categoria.isEmpty() || s.categoria == categoria) &&
                     (texto.isBlank() ||
                         s.titulo.contains(texto, ignoreCase = true) ||
                         s.codigo.contains(texto, ignoreCase = true))
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    // Técnicos disponibles para que el administrador asigne
+    val tecnicos: StateFlow<List<UsuarioEntity>> =
+        db.usuarioDao().observarPorRol(Rol.TECNICO.name)
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _uiState = MutableStateFlow(SolicitudUiState())
     val uiState: StateFlow<SolicitudUiState> = _uiState.asStateFlow()
@@ -62,6 +78,32 @@ class SolicitudViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /** ADMINISTRADOR: define prioridad y asigna un técnico (el estado pasa a "Asignada"). */
+    fun asignar(id: Int, tecnicoCorreo: String, prioridad: String) {
+        if (SesionManager.rol != Rol.ADMINISTRADOR) return
+        viewModelScope.launch {
+            val s = repo.obtener(id) ?: return@launch
+            if (!SolicitudFlujo.puedeAsignar(s.estado)) return@launch
+            repo.guardar(
+                s.copy(
+                    tecnicoCorreo = tecnicoCorreo,
+                    prioridad = prioridad,
+                    estado = SolicitudFlujo.ASIGNADA
+                )
+            )
+        }
+    }
+
+    /** Cambia el estado solo si el perfil actual tiene permiso para esa transición. */
+    fun cambiarEstado(id: Int, nuevoEstado: String) {
+        val rol = SesionManager.rol ?: return
+        viewModelScope.launch {
+            val s = repo.obtener(id) ?: return@launch
+            if (!SolicitudFlujo.puedeCambiar(s.estado, nuevoEstado, rol)) return@launch
+            repo.guardar(s.copy(estado = nuevoEstado))
+        }
+    }
+
     fun cargar(id: Int) {
         if (id == 0) return
         viewModelScope.launch {
@@ -75,7 +117,10 @@ class SolicitudViewModel(app: Application) : AndroidViewModel(app) {
                     descripcion = s.descripcion,
                     categoria = s.categoria,
                     servicio = s.servicio,
-                    evidenciaUri = s.evidenciaUri
+                    evidenciaUri = s.evidenciaUri,
+                    prioridad = s.prioridad,
+                    tecnicoCorreo = s.tecnicoCorreo,
+                    clienteCorreo = s.clienteCorreo
                 )
             }
         }
@@ -134,7 +179,10 @@ class SolicitudViewModel(app: Application) : AndroidViewModel(app) {
                     servicio = s.servicio,
                     evidenciaUri = s.evidenciaUri,
                     estado = s.estado,
-                    fecha = if (s.fecha == 0L) System.currentTimeMillis() else s.fecha
+                    fecha = if (s.fecha == 0L) System.currentTimeMillis() else s.fecha,
+                    prioridad = s.prioridad,
+                    tecnicoCorreo = s.tecnicoCorreo,
+                    clienteCorreo = s.clienteCorreo.ifEmpty { SesionManager.usuario.value?.correo.orEmpty() }
                 )
             )
             _uiState.value = _uiState.value.copy(guardando = false, guardadoExitosamente = true)

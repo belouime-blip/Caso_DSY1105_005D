@@ -13,5 +13,9 @@ data class SolicitudEntity(
     val servicio: String,
     val evidenciaUri: String?,
     val estado: String,
-    val fecha: Long
+    val fecha: Long,
+    // Campos nuevos para los 3 perfiles
+    val prioridad: String = "Media",          // la define el administrador
+    val tecnicoCorreo: String? = null,        // técnico asignado por el administrador
+    val clienteCorreo: String = ""            // cliente que creó la solicitud
 )

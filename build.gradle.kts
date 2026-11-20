@@ -1,5 +1,8 @@
+// Archivo build.gradle.kts de la RAÍZ del proyecto (no el de /app)
+// Las versiones salen de gradle/libs.versions.toml, así no vuelve a haber conflicto de versiones.
 plugins {
-    id("com.android.application") version "8.7.3" apply false
-    id("org.jetbrains.kotlin.android") version "2.0.21" apply false
-    id("org.jetbrains.kotlin.plugin.compose") version "2.0.21" apply false
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.compose) apply false
+    alias(libs.plugins.ksp) apply false
 }
