@@ -5,15 +5,22 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-// version 2: se agregó la tabla usuarios (con apellido y rol) y columnas nuevas en solicitudes
+// version 3: usuarios (con apellido y rol), historial de cambios/comentarios y escaneos QR guardados
 @Database(
-    entities = [SolicitudEntity::class, UsuarioEntity::class],
-    version = 2,
+    entities = [
+        SolicitudEntity::class,
+        UsuarioEntity::class,
+        HistorialEntity::class,
+        EscaneoEntity::class
+    ],
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun solicitudDao(): SolicitudDao
     abstract fun usuarioDao(): UsuarioDao
+    abstract fun historialDao(): HistorialDao
+    abstract fun escaneoDao(): EscaneoDao
 
     companion object {
         @Volatile

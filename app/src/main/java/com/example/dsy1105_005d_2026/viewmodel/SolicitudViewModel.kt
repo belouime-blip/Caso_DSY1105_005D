@@ -3,7 +3,10 @@ package com.example.dsy1105_005d_2026.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.dsy1105_005d_2026.util.Notificador
 import com.example.dsy1105_005d_2026.data.local.AppDatabase
+import com.example.dsy1105_005d_2026.data.local.EscaneoEntity
+import com.example.dsy1105_005d_2026.data.local.HistorialEntity
 import com.example.dsy1105_005d_2026.data.local.SolicitudEntity
 import com.example.dsy1105_005d_2026.data.local.UsuarioEntity
 import com.example.dsy1105_005d_2026.data.model.Rol
@@ -23,7 +26,12 @@ import kotlinx.coroutines.launch
 
 class SolicitudViewModel(app: Application) : AndroidViewModel(app) {
     private val db = AppDatabase.obtener(app)
-    private val repo = SolicitudRepository(db.solicitudDao())
+    private val repo = SolicitudRepository(db.solicitudDao(), db.historialDao())
+
+    private fun autor(): String = SesionManager.usuario.value?.correo.orEmpty()
+
+    private fun aviso(titulo: String, texto: String) =
+        Notificador.avisar(getApplication<Application>(), titulo, texto)
 
     private val _busqueda = MutableStateFlow("")
     val busqueda: StateFlow<String> = _busqueda.asStateFlow()
@@ -65,9 +73,34 @@ class SolicitudViewModel(app: Application) : AndroidViewModel(app) {
 
     fun observar(id: Int): Flow<SolicitudEntity?> = repo.observar(id)
 
+    /**
+     * Busca la solicitud por el código leído en el QR. El escaneo queda guardado en Room.
+     * Solo devuelve el id si la solicitud es visible para el perfil actual.
+     */
     fun buscarPorCodigo(codigo: String, onResultado: (Int?) -> Unit) {
         viewModelScope.launch {
-            onResultado(repo.buscarPorCodigo(codigo.trim())?.id)
+            val limpio = codigo.trim()
+            db.escaneoDao().insertar(
+                EscaneoEntity(
+                    contenido = limpio,
+                    fecha = System.currentTimeMillis(),
+                    usuarioCorreo = autor()
+                )
+            )
+            val encontrada = repo.buscarPorCodigo(limpio)
+            val visible = encontrada != null &&
+                SolicitudFlujo.visiblesPara(listOf(encontrada), SesionManager.usuario.value).isNotEmpty()
+            onResultado(if (visible) encontrada?.id else null)
+        }
+    }
+
+    fun historial(id: Int): Flow<List<HistorialEntity>> = repo.historial(id)
+
+    /** Comentario o evidencia (foto de avance) que queda en el historial de la solicitud. */
+    fun comentar(id: Int, texto: String, fotoUri: String? = null) {
+        if (texto.isBlank() && fotoUri == null) return
+        viewModelScope.launch {
+            repo.registrarHistorial(id, autor(), texto.trim(), fotoUri)
         }
     }
 
@@ -91,6 +124,10 @@ class SolicitudViewModel(app: Application) : AndroidViewModel(app) {
                     estado = SolicitudFlujo.ASIGNADA
                 )
             )
+            repo.registrarHistorial(
+                id, autor(), "Asignada a $tecnicoCorreo con prioridad $prioridad"
+            )
+            aviso("Solicitud asignada", "${s.codigo} fue asignada al técnico $tecnicoCorreo")
         }
     }
 
@@ -101,6 +138,12 @@ class SolicitudViewModel(app: Application) : AndroidViewModel(app) {
             val s = repo.obtener(id) ?: return@launch
             if (!SolicitudFlujo.puedeCambiar(s.estado, nuevoEstado, rol)) return@launch
             repo.guardar(s.copy(estado = nuevoEstado))
+            repo.registrarHistorial(id, autor(), "Estado: ${s.estado} → $nuevoEstado")
+            if (nuevoEstado == SolicitudFlujo.RESUELTA) {
+                aviso("Solicitud resuelta", "${s.codigo}: pendiente de confirmación del cliente")
+            } else {
+                aviso("Actualización de estado", "${s.codigo} ahora está en: $nuevoEstado")
+            }
         }
     }
 
@@ -169,7 +212,7 @@ class SolicitudViewModel(app: Application) : AndroidViewModel(app) {
 
         _uiState.value = s.copy(guardando = true)
         viewModelScope.launch {
-            repo.guardar(
+            val idGuardado = repo.guardar(
                 SolicitudEntity(
                     id = s.id,
                     codigo = s.codigo.ifEmpty { "SOL-" + UUID.randomUUID().toString().take(8).uppercase() },
@@ -185,6 +228,14 @@ class SolicitudViewModel(app: Application) : AndroidViewModel(app) {
                     clienteCorreo = s.clienteCorreo.ifEmpty { SesionManager.usuario.value?.correo.orEmpty() }
                 )
             )
+            val esNueva = s.id == 0
+            repo.registrarHistorial(
+                solicitudId = if (esNueva) idGuardado.toInt() else s.id,
+                autor = autor(),
+                texto = if (esNueva) "Solicitud creada (Recibida)" else "Solicitud editada",
+                fotoUri = s.evidenciaUri
+            )
+            if (esNueva) aviso("Nueva solicitud recibida", s.titulo)
             _uiState.value = _uiState.value.copy(guardando = false, guardadoExitosamente = true)
         }
     }

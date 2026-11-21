@@ -24,5 +24,5 @@ interface SolicitudDao {
     suspend fun eliminar(id: Int)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun guardar(solicitud: SolicitudEntity)
+    suspend fun guardar(solicitud: SolicitudEntity): Long
 }

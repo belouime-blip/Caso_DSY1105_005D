@@ -40,6 +40,8 @@ android {
     }
     packaging {
         resources {
+            excludes += "/META-INF/LICENSE.md"
+            excludes += "/META-INF/LICENSE-notice.md"
             excludes += "/META-INF/{AL2.0,LGPL2.1,LICENSE*,NOTICE*}"
             excludes += "/META-INF/*.kotlin_module"
         }

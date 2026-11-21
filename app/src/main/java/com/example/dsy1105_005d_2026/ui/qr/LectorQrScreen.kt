@@ -40,8 +40,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import com.example.dsy1105_005d_2026.ui.components.QrScanner
+import com.example.dsy1105_005d_2026.ui.solicitud.formatoFecha
 import com.example.dsy1105_005d_2026.util.CameraPermissionHelper
+import com.example.dsy1105_005d_2026.viewmodel.AppViewModelFactory
 import com.example.dsy1105_005d_2026.viewmodel.QrViewModel
 
 /**
@@ -51,11 +55,12 @@ import com.example.dsy1105_005d_2026.viewmodel.QrViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LectorQrScreen(
-    viewModel: QrViewModel = viewModel()
+    viewModel: QrViewModel = viewModel(factory = AppViewModelFactory(LocalContext.current))
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val qrResult by viewModel.qrResult.collectAsState()
+    val historial by viewModel.historial.collectAsState()
 
     var hasCameraPermission by remember {
         mutableStateOf(CameraPermissionHelper.hasCameraPermission(context))
@@ -90,6 +95,7 @@ fun LectorQrScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -181,6 +187,23 @@ fun LectorQrScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Escanear otro código QR")
+                }
+            }
+
+            // Escaneos guardados en Room (los 20 más recientes del usuario)
+            if (historial.isNotEmpty()) {
+                Spacer(Modifier.height(24.dp))
+                Text(
+                    "Escaneos guardados",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                historial.take(5).forEach { e ->
+                    Text(
+                        "${formatoFecha(e.fecha)} · ${e.contenido}",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(vertical = 2.dp)
+                    )
                 }
             }
         }
