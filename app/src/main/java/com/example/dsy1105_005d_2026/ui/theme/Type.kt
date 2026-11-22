@@ -31,8 +31,4 @@ val Typography = Typography(
         letterSpacing = 0.5.sp
     )
     */
-<<<<<<< HEAD
 )
-=======
-)
->>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171

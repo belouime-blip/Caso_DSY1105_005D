@@ -17,13 +17,10 @@ class AuthRepository(private val dao: UsuarioDao) {
     suspend fun login(correo: String, clave: String): UsuarioEntity? =
         dao.iniciarSesion(correo.trim().lowercase(), clave)
 
-<<<<<<< HEAD
     /** Busca una cuenta existente para desbloqueo biométrico local del dispositivo. */
     suspend fun usuarioPorCorreo(correo: String): UsuarioEntity? =
         dao.obtenerPorCorreo(correo.trim().lowercase())
 
-=======
->>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171
     /** El auto-registro siempre crea perfiles CLIENTE. Falla si el correo ya existe. */
     suspend fun registrar(usuario: UsuarioEntity): ResultadoRegistro {
         val correo = usuario.correo.trim().lowercase()

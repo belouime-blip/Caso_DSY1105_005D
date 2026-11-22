@@ -21,7 +21,6 @@ API EXTERNA: https://jsonplaceholder.typicode.com/posts (catálogo de servicios,
 
 Para la explicación completa del proyecto (arquitectura, flujo, pruebas, qué modificar en la defensa)
 lee EXPLICACION_DEFENSA.md
-<<<<<<< HEAD
 
 NUEVO EN ESTA VERSION
 - Acceso biométrico con BiometricPrompt (si el dispositivo lo soporta).
@@ -35,5 +34,3 @@ IMPORTANTE SOBRE SPRING BOOT
 La app ya consume la API pública de ejemplo por Retrofit. Para conectar el microservicio
 Spring Boot del equipo se debe configurar la URL y los endpoints reales del backend.
 No se inventó una dirección ni una estructura de respuesta que no venían en el proyecto.
-=======
->>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171

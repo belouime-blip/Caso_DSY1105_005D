@@ -51,7 +51,6 @@ class LoginViewModelTest : StringSpec({
         vm.uiState.isLoading shouldBe false
     }
 
-<<<<<<< HEAD
 
     "el acceso biométrico desbloquea la cuenta indicada por correo" {
         val cliente = usuario("cliente@duoc.cl", Rol.CLIENTE)
@@ -66,8 +65,6 @@ class LoginViewModelTest : StringSpec({
         SesionManager.usuario.value shouldBe cliente
     }
 
-=======
->>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171
     "el mismo login lleva a la página de cada perfil (cliente, administrador, técnico)" {
         Rol.CLIENTE.rutaInicio shouldBe "cliente_home"
         Rol.ADMINISTRADOR.rutaInicio shouldBe "admin_home"

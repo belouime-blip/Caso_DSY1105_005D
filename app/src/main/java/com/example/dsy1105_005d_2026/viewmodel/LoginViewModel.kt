@@ -50,4 +50,27 @@ class LoginViewModel(
             }
         }
     }
+
+    /**
+     * Se llama después de que BiometricPrompt confirmó la identidad en el dispositivo.
+     * Abre la cuenta local asociada al correo escrito, sin pedir la contraseña.
+     */
+    fun biometricLogin(correo: String, onSuccess: (Rol) -> Unit) {
+        if (correo.isBlank()) {
+            uiState = uiState.copy(error = "Escribe tu correo para usar el acceso biométrico")
+            return
+        }
+        uiState = uiState.copy(isLoading = true, error = null)
+
+        viewModelScope.launch {
+            val usuario = repo.usuarioPorCorreo(correo)
+            if (usuario == null) {
+                uiState = uiState.copy(isLoading = false, error = "No existe una cuenta con ese correo")
+            } else {
+                SesionManager.iniciar(usuario)
+                uiState = uiState.copy(isLoading = false)
+                onSuccess(Rol.desde(usuario.rol))
+            }
+        }
+    }
 }

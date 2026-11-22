@@ -4,10 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
-<<<<<<< HEAD
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
-=======
->>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 

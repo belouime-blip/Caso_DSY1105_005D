@@ -17,10 +17,7 @@ import com.example.dsy1105_005d_2026.ui.qr.LectorQrScreen
 import com.example.dsy1105_005d_2026.ui.registro.RegistroScreen
 import com.example.dsy1105_005d_2026.ui.solicitud.DetalleSolicitudScreen
 import com.example.dsy1105_005d_2026.ui.solicitud.ListaSolicitudesScreen
-<<<<<<< HEAD
 import com.example.dsy1105_005d_2026.ui.solicitud.GaleriaEvidenciasScreen
-=======
->>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171
 import com.example.dsy1105_005d_2026.ui.solicitud.QrScannerScreen
 import com.example.dsy1105_005d_2026.ui.solicitud.SolicitudFormScreen
 import com.example.dsy1105_005d_2026.ui.theme.HomeScreen
@@ -57,10 +54,7 @@ fun AppNavigation() {
                 onCatalogo = { navController.navigate("catalogo") },
                 onLectorQr = { navController.navigate("lector_qr") },
                 onPerfil = { navController.navigate("perfil") },
-<<<<<<< HEAD
                 onGaleria = { navController.navigate("galeria") },
-=======
->>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171
                 onCerrarSesion = { cerrarSesion(navController) }
             )
         }
@@ -70,10 +64,7 @@ fun AppNavigation() {
                 onTodasLasSolicitudes = { navController.navigate("lista") },
                 onLectorQr = { navController.navigate("lector_qr") },
                 onPerfil = { navController.navigate("perfil") },
-<<<<<<< HEAD
                 onGaleria = { navController.navigate("galeria") },
-=======
->>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171
                 onCerrarSesion = { cerrarSesion(navController) }
             )
         }
@@ -83,23 +74,17 @@ fun AppNavigation() {
                 onMisAsignadas = { navController.navigate("lista") },
                 onLectorQr = { navController.navigate("lector_qr") },
                 onPerfil = { navController.navigate("perfil") },
-<<<<<<< HEAD
                 onGaleria = { navController.navigate("galeria") },
-=======
->>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171
                 onCerrarSesion = { cerrarSesion(navController) }
             )
         }
 
         composable("perfil") { PerfilScreen() }
 
-<<<<<<< HEAD
         composable("galeria") {
             GaleriaEvidenciasScreen(onVolver = { navController.popBackStack() })
         }
 
-=======
->>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171
         composable("catalogo") { PostScreen() }
 
         // ---------- Solicitudes (la lista se filtra sola según el perfil) ----------

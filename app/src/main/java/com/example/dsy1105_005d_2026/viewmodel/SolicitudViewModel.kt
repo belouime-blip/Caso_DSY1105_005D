@@ -96,13 +96,10 @@ class SolicitudViewModel(app: Application) : AndroidViewModel(app) {
 
     fun historial(id: Int): Flow<List<HistorialEntity>> = repo.historial(id)
 
-<<<<<<< HEAD
     /** Historial de códigos QR leídos por el usuario activo, persistido en Room. */
     fun escaneos(): Flow<List<EscaneoEntity>> =
         db.escaneoDao().observarPorUsuario(autor())
 
-=======
->>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171
     /** Comentario o evidencia (foto de avance) que queda en el historial de la solicitud. */
     fun comentar(id: Int, texto: String, fotoUri: String? = null) {
         if (texto.isBlank() && fotoUri == null) return
