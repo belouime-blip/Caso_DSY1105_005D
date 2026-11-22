@@ -1,0 +1,63 @@
+CAMBIOS REALIZADOS — VERSION MEJORADA
+
+1) Login biométrico
+Archivo:
+app/src/main/java/com/example/dsy1105_005d_2026/ui/theme/HomeScreen.kt
+Se agregó botón "Entrar con huella o reconocimiento del dispositivo".
+Android muestra su ventana biométrica segura. Primero se escribe el correo para identificar
+qué cuenta local se va a abrir. Si el dispositivo no admite biometría, se usa correo y clave.
+
+2) Compatibilidad biométrica
+Archivos:
+app/build.gradle.kts
+app/src/main/AndroidManifest.xml
+app/src/main/java/com/example/dsy1105_005d_2026/MainActivity.kt
+Se agregaron dependencias y permiso biométrico. MainActivity ahora usa FragmentActivity,
+requerida por BiometricPrompt.
+
+3) Galería e historial de QR
+Archivos:
+ui/solicitud/GaleriaEvidenciasScreen.kt
+ui/navigation/AppNavigation.kt
+ui/perfiles/ClienteHomeScreen.kt
+ui/perfiles/AdminHomeScreen.kt
+ui/perfiles/TecnicoHomeScreen.kt
+viewmodel/SolicitudViewModel.kt
+La galería lista las fotos de las solicitudes visibles para cada perfil y el historial de
+códigos QR que el usuario escaneó. Las fotos quedan dentro de files/evidencias; las lecturas
+QR quedan en Room, tabla escaneos.
+
+4) Adjuntar una imagen
+Archivo:
+ui/solicitud/SolicitudFormScreen.kt
+Además de tomar una fotografía con la cámara, se puede seleccionar una imagen existente.
+La app copia esa imagen a su almacenamiento privado y registra su URI en la solicitud.
+
+5) Salida
+Archivo:
+ui/perfiles/PerfilHome.kt
+Se mantienen "Cerrar sesión" y se incorpora "Salir de la aplicación" con confirmación.
+
+6) Barra de navegación Android
+Archivo:
+MainActivity.kt
+Se evita ocultar la barra de navegación del sistema. Atrás, Inicio y Recientes pertenecen
+a Android; la app no puede forzar el modo de tres botones si el teléfono está configurado
+para gestos.
+
+7) Prueba unitaria biométrica
+Archivo:
+app/src/test/java/com/example/dsy1105_005d_2026/LoginViewModelTest.kt
+Se agregó una prueba del flujo de acceso biométrico simulado a nivel ViewModel.
+
+8) Documentación
+Archivo:
+EXPLICACION_DEFENSA.md
+Explica arquitectura, perfiles, almacenamiento, biometría, QR, pruebas, APK release y
+qué explicar al docente.
+
+PENDIENTE DE INTEGRACIÓN EXTERNA
+El proyecto entregado no incluye el código ni la URL del microservicio Spring Boot del equipo.
+Por eso se conserva el consumo Retrofit de la API pública JSONPlaceholder y se documenta
+cómo conectar el backend real cuando se conozca su URL y contrato (endpoints/JSON).
+Tampoco se puede generar una APK release firmada sin que el equipo cree su propio keystore.
