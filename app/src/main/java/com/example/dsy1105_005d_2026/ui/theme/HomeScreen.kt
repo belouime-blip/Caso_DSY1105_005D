@@ -1,10 +1,8 @@
 package com.example.dsy1105_005d_2026.ui.theme
-
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.FragmentActivity
 import androidx.core.content.ContextCompat
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -61,6 +59,7 @@ fun HomeScreen(
 ) {
     val state = vm.uiState
     var showPass by remember { mutableStateOf(false) }
+<<<<<<< HEAD
     val context = LocalContext.current
     val activity = context as? FragmentActivity
     val biometricDisponible = BiometricManager.from(context).canAuthenticate(
@@ -94,6 +93,8 @@ fun HomeScreen(
             .build()
         prompt.authenticate(info)
     }
+=======
+>>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171
 
     MaterialTheme(colorScheme = ColoresApp) {
         Column(
@@ -191,6 +192,7 @@ fun HomeScreen(
                         Text(if (state.isLoading) "Validando..." else "Iniciar sesión")
                     }
 
+<<<<<<< HEAD
                     if (biometricDisponible) {
                         OutlinedButton(
                             onClick = { iniciarConBiometria() },
@@ -206,6 +208,8 @@ fun HomeScreen(
                         )
                     }
 
+=======
+>>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171
                     TextButton(
                         onClick = { navController.navigate("registro") },
                         modifier = Modifier.fillMaxWidth()

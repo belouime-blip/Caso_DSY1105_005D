@@ -5,7 +5,10 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Person
+<<<<<<< HEAD
 import androidx.compose.material.icons.filled.PhotoLibrary
+=======
+>>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,7 +25,10 @@ fun ClienteHomeScreen(
     onCatalogo: () -> Unit,
     onLectorQr: () -> Unit,
     onPerfil: () -> Unit,
+<<<<<<< HEAD
     onGaleria: () -> Unit,
+=======
+>>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171
     onCerrarSesion: () -> Unit,
     vm: SolicitudViewModel = viewModel()
 ) {
@@ -36,8 +42,12 @@ fun ClienteHomeScreen(
             OpcionHome("Mis solicitudes", "Seguimiento, estado, historial y comentarios", Icons.Default.Description, onMisSolicitudes),
             OpcionHome("Catálogo de servicios", "Servicios disponibles (API externa)", Icons.Default.Category, onCatalogo),
             OpcionHome("Lector QR", "Escanear el código de una solicitud", Icons.Default.QrCodeScanner, onLectorQr),
+<<<<<<< HEAD
             OpcionHome("Mi perfil", "Ver y editar mis datos", Icons.Default.Person, onPerfil),
             OpcionHome("Galería de evidencias", "Consultar fotos guardadas en las solicitudes", Icons.Default.PhotoLibrary, onGaleria)
+=======
+            OpcionHome("Mi perfil", "Ver y editar mis datos", Icons.Default.Person, onPerfil)
+>>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171
         ),
         onCerrarSesion = onCerrarSesion,
         contenidoExtra = { ResumenEstados("Mis solicitudes", solicitudes) }

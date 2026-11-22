@@ -40,7 +40,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.dsy1105_005d_2026.viewmodel.SolicitudViewModel
 import java.io.File
+<<<<<<< HEAD
 import java.io.FileOutputStream
+=======
+>>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171
 
 val categorias = listOf("Reclamo", "Consulta", "Sugerencia", "Soporte")
 private val servicios = listOf("Instalación", "Mantención", "Soporte técnico", "Facturación")
@@ -60,6 +63,7 @@ fun SolicitudFormScreen(
         if (ok) vm.onEvidenciaChange(fotoPendiente)
     }
 
+<<<<<<< HEAD
     // Permite adjuntar una imagen existente (por ejemplo, una foto de un documento escaneado).
     val selectorImagen = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
@@ -76,6 +80,8 @@ fun SolicitudFormScreen(
         }
     }
 
+=======
+>>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171
     val tomarFoto = {
         val carpeta = File(context.filesDir, "evidencias").apply { mkdirs() }
         val archivo = File(carpeta, "ev_${System.currentTimeMillis()}.jpg")
@@ -150,6 +156,7 @@ fun SolicitudFormScreen(
                 Text(if (state.evidenciaUri == null) "Tomar foto de evidencia" else "Cambiar foto")
             }
 
+<<<<<<< HEAD
             OutlinedButton(
                 onClick = { selectorImagen.launch("image/*") },
                 modifier = Modifier.fillMaxWidth()
@@ -157,6 +164,8 @@ fun SolicitudFormScreen(
                 Text("Adjuntar imagen o documento fotografiado")
             }
 
+=======
+>>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171
             state.evidenciaUri?.let {
                 AsyncImage(
                     model = it,

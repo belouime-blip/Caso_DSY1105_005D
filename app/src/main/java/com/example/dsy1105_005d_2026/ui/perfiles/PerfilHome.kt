@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
+<<<<<<< HEAD
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.mutableStateOf
@@ -21,6 +22,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import android.app.Activity
+=======
+>>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,6 +36,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+<<<<<<< HEAD
+=======
+import androidx.compose.runtime.getValue
+>>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -67,8 +74,11 @@ fun PerfilHome(
     contenidoExtra: @Composable () -> Unit = {}
 ) {
     val usuario by SesionManager.usuario.collectAsState()
+<<<<<<< HEAD
     val context = LocalContext.current
     var confirmarSalida by remember { mutableStateOf(false) }
+=======
+>>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171
 
     MaterialTheme(colorScheme = ColoresApp) {
         Scaffold(
@@ -114,6 +124,7 @@ fun PerfilHome(
                     Spacer(Modifier.width(8.dp))
                     Text("Cerrar sesión")
                 }
+<<<<<<< HEAD
 
                 OutlinedButton(
                     onClick = { confirmarSalida = true },
@@ -138,6 +149,8 @@ fun PerfilHome(
                         }
                     )
                 }
+=======
+>>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171
             }
         }
     }

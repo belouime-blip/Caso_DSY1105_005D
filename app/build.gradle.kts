@@ -64,8 +64,11 @@ dependencies {
 
     //Dependencias para la navegacion con Jetpack Compose
     implementation("androidx.navigation:navigation-compose:2.7.7")
+<<<<<<< HEAD
     implementation("androidx.biometric:biometric:1.1.0")
     implementation("androidx.fragment:fragment-ktx:1.8.5")
+=======
+>>>>>>> c1ae68d71e4def1f1aa11c0b38ba3da892369171
 
     //DEpendencias para Iconos
     implementation("androidx.compose.material:material-icons-core")
